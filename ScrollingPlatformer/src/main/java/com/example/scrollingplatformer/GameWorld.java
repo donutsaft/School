@@ -35,6 +35,7 @@ class GameWorld {
     private AnimationTimer loop;
 
     private double startX, startY; // Respawn Position
+
     private double checkpointCameraOffset = 0;
 
     private ImageView background;
@@ -63,9 +64,10 @@ class GameWorld {
         // PLATTFORMEN
         // ===============================
 
-        platforms.add(new Platform(0, HEIGHT - 200, 1000, 200, "/platforms/ground_placeholder.png"));
+        platforms.add(new Platform(0, HEIGHT - 200, 1000, 200, "/platforms/brick.png"));
+        platforms.add(new Platform(0, HEIGHT - 200, 1000, 200, "/platforms/brick.png"));
         platforms.add(new Platform(1100, HEIGHT - 300, 250, 300, "/platforms/ground_placeholder.png"));
-        platforms.add(new Platform(1500, HEIGHT - 350, 250, 350, "/platforms/street-export.png"));
+        platforms.add(new Platform(1500, HEIGHT - 350, 250, 350, "/platforms/street.png"));
 
         // ===============================
         // CHECKPOINTS
@@ -86,6 +88,10 @@ class GameWorld {
         // Spieler zuletzt (damit er über allem liegt)
         startX = WIDTH / 2 - 25;
         startY = HEIGHT - 300;
+
+//        final double rStartX = startX;
+//        final double rStartY = startY;
+
         player = new Player(this, startX, startY);
         root.getChildren().addAll(player.getSprite(), player.getShape());
 

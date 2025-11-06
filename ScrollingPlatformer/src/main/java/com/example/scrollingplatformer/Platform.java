@@ -18,6 +18,15 @@ class Platform {
     }
 
     public Rectangle getShape() { return shape; }
-    public void moveX(double dx) { shape.setX(shape.getX() + dx); }
+
+    public void moveX(double dx) {
+        shape.setX(shape.getX() + dx);
+
+        // Textur soll nicht "mitrutschen" beim Verschieben:
+        var pattern = (ImagePattern) shape.getFill();
+        shape.setFill(new ImagePattern(pattern.getImage(), shape.getX(), shape.getY(),
+                pattern.getImage().getWidth(), pattern.getImage().getHeight(), false));
+    }
+
     public double getTop() { return shape.getY(); }
 }
