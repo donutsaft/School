@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 class GameWorld {
     private final double WIDTH;
@@ -36,6 +37,8 @@ class GameWorld {
     private double startX, startY; // Respawn Position
     private double checkpointCameraOffset = 0;
 
+    private ImageView background;
+
     public GameWorld(double width, double height) {
         this.WIDTH = width;
         this.HEIGHT = height;
@@ -45,28 +48,46 @@ class GameWorld {
         root = new Pane();
         scene = new Scene(root, WIDTH, HEIGHT, Color.LIGHTBLUE);
 
-        // Spieler
+        // ===============================
+        // HINTERGRUND
+        // ===============================
+        Image bgImage = new Image(getClass().getResourceAsStream("/backgrounds/bg_placeholder2.png"));
+        background = new ImageView(bgImage);
+        background.setFitWidth(WIDTH);
+        background.setFitHeight(HEIGHT);
+        background.setPreserveRatio(false);
+        background.setSmooth(false); // für Pixel-Look
+        root.getChildren().add(background);
+
+        // ===============================
+        // PLATTFORMEN
+        // ===============================
+
+        platforms.add(new Platform(0, HEIGHT - 200, 1000, 200, "/platforms/ground_placeholder.png"));
+        platforms.add(new Platform(1100, HEIGHT - 300, 250, 300, "/platforms/ground_placeholder.png"));
+        platforms.add(new Platform(1500, HEIGHT - 350, 250, 350, "/platforms/street-export.png"));
+
+        // ===============================
+        // CHECKPOINTS
+        // ===============================
+
+        checkpoints.add(new Checkpoint(1200, HEIGHT - 360));
+        checkpoints.add(new Checkpoint(100, HEIGHT - 260));
+
+        // ===============================
+        // ALLES ZUR SZENE HINZUFÜGEN (RICHTIGE REIHENFOLGE)
+        // ===============================
+        // Plattformen zuerst (Sprite + unsichtbare Hitbox)
+        for (Platform p : platforms) root.getChildren().add(p.getShape());
+
+        // Danach Checkpoints
+        for (Checkpoint c : checkpoints) root.getChildren().add(c.getShape());
+
+        // Spieler zuletzt (damit er über allem liegt)
         startX = WIDTH / 2 - 25;
-        startY = HEIGHT - 225;
+        startY = HEIGHT - 300;
         player = new Player(this, startX, startY);
         root.getChildren().addAll(player.getSprite(), player.getShape());
-
-
-        // Plattformen
-        platforms.add(new Platform(0, HEIGHT - 100, 1000, 100, Color.GREY));
-        platforms.add(new Platform(0, HEIGHT - 150, 1000, 50, Color.BROWN));
-        platforms.add(new Platform(0, HEIGHT - 175, 1000, 25, Color.GREEN));
-        platforms.add(new Platform(1100, HEIGHT - 200, 150, 40, Color.GREEN));
-        platforms.add(new Platform(-10, HEIGHT - 500, 10, 500, Color.LIGHTBLUE));//Unsichtbare Barriere
-        platforms.add(new Platform(1350, HEIGHT - 300, 150, 40, Color.GREEN));
-
-        // Beispiel-Checkpoints
-        checkpoints.add(new Checkpoint(1400, HEIGHT - 360));
-        checkpoints.add(new Checkpoint(100, HEIGHT - 235));
-
-        // Alles in Szene laden
-        for (Platform p : platforms) root.getChildren().add(p.getShape());
-        for (Checkpoint c : checkpoints) root.getChildren().add(c.getShape());
 
         // Tasteneingaben
         scene.setOnKeyPressed(e -> pressedKeys.add(e.getCode()));
@@ -120,8 +141,14 @@ class GameWorld {
 
         if (!xBlocked) {
             for (Platform plat : platforms) plat.moveX(dx);
-            for (Checkpoint c : checkpoints) c.moveX(dx); // Checkpoints bewegen sich mit
+            for (Checkpoint c : checkpoints) c.moveX(dx);
             cameraOffsetX += dx;
+
+            // ===============================
+            // EINFACHES PARALLAX-SCROLLING
+            // ===============================
+            double parallaxSpeed = 0.1; // 0.0 = still, 1.0 = bewegt sich gleich schnell wie Plattformen
+            background.setTranslateX(cameraOffsetX * parallaxSpeed);
         }
 
         // ------------------------------
@@ -140,20 +167,18 @@ class GameWorld {
         // ------------------------------
         // Checkpoint-Aktivierung
         // ------------------------------
-
         for (Checkpoint c : checkpoints) {
             if (!c.isActivated() && player.intersectsCheckpoint(c)) {
                 c.activate();
 
-                // Fester Respawnpunkt direkt beim Checkpoint
+                // Spieler mittig auf die Unterkante des Checkpoints setzen
                 startX = c.getShape().getX() + c.getShape().getWidth() / 2 - player.getWidth() / 2;
-                startY = c.getShape().getY();
+                startY = c.getShape().getY() + c.getShape().getHeight() - player.getHeight();
                 checkpointCameraOffset = cameraOffsetX;
 
                 System.out.println("Checkpoint aktiviert -> Respawn bei X=" + startX + " | Y=" + startY);
             }
         }
-
 
         // --- SPIELER GEFALLEN ---
         if (player.getY() > DEATH_Y) {

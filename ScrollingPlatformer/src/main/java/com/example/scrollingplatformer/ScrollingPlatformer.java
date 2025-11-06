@@ -14,7 +14,7 @@ public class ScrollingPlatformer extends Application {
         gameWorld = new GameWorld(1200, 700);
         Scene scene = gameWorld.createScene();
 
-        stage.setTitle("v0.0.1.4");
+        stage.setTitle("v0.0.1.7");
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();

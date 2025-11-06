@@ -14,17 +14,26 @@ class Player {
         this.world = world;
 
         // Hitbox (Kollision & Physik)
-        shape = new Rectangle(25, 50, Color.TRANSPARENT); //Eigentlich unsichtbar / .TRANSPARENT
+        shape = new Rectangle(32, 100, Color.TRANSPARENT); //Eigentlich unsichtbar / .TRANSPARENT
         shape.setX(x);
         shape.setY(y);
 
         // Sprite (Anzeige)
-        Image image = new Image(getClass().getResourceAsStream("/sprites/platzhalter50-25.png"));
+        Image image = new Image(getClass().getResourceAsStream("/sprites/player_placeholder.png"));
+        /**
+         * Skin "Galerie":
+         * 1. player_placeholder.png // Halt Platzhalter
+         * 2. platzhalter50-25.png // Halt Platzhalter
+         * 3. platzhalter32-16.png // Halt Platzhalter
+         * 4. player_gpt.png // Gibt noch paar Probleme mit
+         * 5. tram.png // Eigentlich nicht dafür gedacht
+         */
         sprite = new ImageView(image);
-        sprite.setFitWidth(40);
-        sprite.setFitHeight(60);
-        sprite.setX(x - 7); // leicht zentrieren über der Hitbox
-        sprite.setY(y - 10);
+        sprite.setSmooth(false);
+        sprite.setFitWidth(32*1.5);
+        sprite.setFitHeight(64*1.5);
+        sprite.setX(x + (shape.getWidth() - sprite.getFitWidth()) / 2);
+        sprite.setY(y + (shape.getHeight() - sprite.getFitHeight()));
     }
 
     // ===== GETTER =====
@@ -40,15 +49,19 @@ class Player {
     // ===== BEWEGUNG =====
     public void setY(double y) {
         shape.setY(y);
-        sprite.setY(y - 10); // Sprite mitbewegen
+        sprite.setY(y + (shape.getHeight() - sprite.getFitHeight()));
     }
+
 
     public void setPosition(double x, double y) {
         shape.setX(x);
         shape.setY(y);
-        sprite.setX(x - 7);
-        sprite.setY(y - 10);
+
+        // Sprite zentriert auf die Hitbox ausrichten
+        sprite.setX(x + (shape.getWidth() - sprite.getFitWidth()) / 2);
+        sprite.setY(y + (shape.getHeight() - sprite.getFitHeight()));
     }
+
 
     public void moveY(double dy) {
         setPosition(getX(), getY() + dy);
