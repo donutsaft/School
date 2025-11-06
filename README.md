@@ -1,4 +1,4 @@
 # School
 Nur temporäre Lösung mache mich später dran das Richtig zu übertragen. 
 
-Denkt dran auch die Sprites herunter zu laden und falls ihr im JavaEditor arbeitet, dieses Package raus zu löschen. 
+Wahrscheinlich für den Rest des Projekts die bevorzugte Version, da es einfach und schneller ist.
